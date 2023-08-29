@@ -6,10 +6,12 @@ import { appHasDailyNotesPluginLoaded, createDailyNote, getAllDailyNotes, getDai
 
 interface WakaBoxPluginSettings {
 	apiKey: string;
+	apiURL: string;
 }
 
 const DEFAULT_SETTINGS: WakaBoxPluginSettings = {
-	apiKey: ''
+	apiKey: '',
+	apiURL: 'https://wakatime.com/api/v1/'
 }
 
 export default class WakaBoxPlugin extends Plugin {
@@ -50,7 +52,7 @@ export default class WakaBoxPlugin extends Plugin {
 				}
 				const date = moment().format("YYYY-MM-DD");
 				if (this.summaryFetcher != undefined) {
-					this.summaryFetcher.requestWakaTimeSummary(this.settings.apiKey, date, true, this.onFetchedSummary);
+					this.summaryFetcher.requestWakaTimeSummary(this.settings.apiKey, this.settings.apiURL, date, true, this.onFetchedSummary);
 				}
 			}
 		})
@@ -64,7 +66,7 @@ export default class WakaBoxPlugin extends Plugin {
 				}
 				const date = moment().subtract(1, 'days').format("YYYY-MM-DD");
 				if (this.summaryFetcher != undefined) {
-					this.summaryFetcher.requestWakaTimeSummary(this.settings.apiKey, date, true, this.onFetchedSummary);
+					this.summaryFetcher.requestWakaTimeSummary(this.settings.apiKey, this.settings.apiURL, date, true, this.onFetchedSummary);
 				}
 			}
 		})
@@ -80,7 +82,7 @@ export default class WakaBoxPlugin extends Plugin {
 					try {
 						const date = moment(result).format("YYYY-MM-DD");
 						if (this.summaryFetcher != undefined) {
-							this.summaryFetcher.requestWakaTimeSummary(this.settings.apiKey, date, true, (summary: Summary | undefined, _: boolean) => {
+							this.summaryFetcher.requestWakaTimeSummary(this.settings.apiKey, this.settings.apiURL, date, true, (summary: Summary | undefined, _: boolean) => {
 								if (summary == undefined) {
 									console.warn("WakaTime box: no summary data received");
 									return;
@@ -101,12 +103,12 @@ export default class WakaBoxPlugin extends Plugin {
 		this.summaryFetcher = new SummaryDataFetcher(this.app);
 		// TODO fetch previous data if open a file from the same day
 		const date = moment().format("YYYY-MM-DD");
-		this.summaryFetcher.requestWakaTimeSummary(this.settings.apiKey, date, false, this.onFetchedSummary);
+		this.summaryFetcher.requestWakaTimeSummary(this.settings.apiKey, this.settings.apiURL, date, false, this.onFetchedSummary);
 		const interval = 60 * 60 * 1000;
 		this.registerInterval(window.setInterval(() => {
 			if (this.summaryFetcher != undefined) {
 				const date = moment().format("YYYY-MM-DD");
-				this.summaryFetcher.requestWakaTimeSummary(this.settings.apiKey, date, false, this.onFetchedSummary);
+				this.summaryFetcher.requestWakaTimeSummary(this.settings.apiKey, this.settings.apiURL, date, false, this.onFetchedSummary);
 			}
 		}, interval));
 	}
@@ -284,8 +286,8 @@ class SummaryDataFetcher {
 	}
 
 	// read cache or fetch data from wakatime
-	async requestWakaTimeSummary(apiKey: String, date: string, force: boolean, callback: (summary: Summary | undefined, fromCache: boolean) => void) {
-		const baseUrl = "https://wakatime.com/api/v1/users/current/summaries"
+	async requestWakaTimeSummary(apiKey: String, apiURL: String, date: string, force: boolean, callback: (summary: Summary | undefined, fromCache: boolean) => void) {
+		const baseUrl = (apiURL.endsWith("/") ? apiURL.slice(0, -1) : apiURL) + "/users/current/summaries"
 		const url = baseUrl + "?start=" + date + "&end=" + date + "&api_key=" + apiKey;
 		try {
 			if (force) {
