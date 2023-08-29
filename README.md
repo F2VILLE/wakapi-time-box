@@ -1,5 +1,15 @@
 # Obsidian WakaTime Box
 
+## READ BEFORE USING !
+
+This extension has been made by @simonla. (https://github.com/simonla/obsidian_waka_box).
+
+I only added the possibility of custom api URL in case of using self-hosted wakatime server.
+
+I did that in 10 minutes so many bugs could happen, if you do not use a custom wakatime server, please use the [original extension](https://github.com/simonla/obsidian_waka_box) !
+
+---
+
 ![](./docs/screenshot.webp)
 ![](./docs/screenshot_2.webp)
 
