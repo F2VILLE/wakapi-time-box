@@ -289,7 +289,6 @@ class SummaryDataFetcher {
 	async requestWakaTimeSummary(apiKey: String, apiURL: String, date: string, force: boolean, callback: (summary: Summary | undefined, fromCache: boolean) => void) {
 		const baseUrl = (apiURL.endsWith("/") ? apiURL.slice(0, -1) : apiURL) + (apiURL.includes("wakatime.com") ? "/users/current/summaries" : "/compat/wakatime/v1/users/current/summaries")
 		const url = baseUrl + "?start=" + date + "&end=" + date + "&api_key=" + apiKey;
-		new Notice('WakaTime box: trying url: ' + url, 5000);
 		try {
 			if (force) {
 				const result = await this.fetchViaAPI(url, date);
